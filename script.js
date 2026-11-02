@@ -10,6 +10,51 @@ const SEASONS = {
 };
 const STORAGE_KEY = "season";
 
+/* NEW CHANGE 23: only the DIFFERENCES between seasons are described here.
+   Shared settings live once in buildParticlesConfig() below (DRY principle). */
+const PARTICLES = {
+  winter: {
+    colors: ["#ffffff", "#dbeeff"],
+    shape: "circle",
+    count: 120,
+    size: 4,
+    speed: 2,
+    direction: "bottom",
+    opacity: 0.8,
+    twinkle: false,
+  },
+  spring: {
+    colors: ["#ff9ec4", "#ffffff", "#ffc4dc"],
+    shape: "circle",
+    count: 60,
+    size: 6,
+    speed: 1.5,
+    direction: "bottom",
+    opacity: 0.85,
+    twinkle: false,
+  },
+  summer: {
+    colors: ["#fff7c2", "#ffffff"],
+    shape: "circle",
+    count: 50,
+    size: 5,
+    speed: 1,
+    direction: "top",
+    opacity: 0.8,
+    twinkle: true,
+  },
+  autumn: {
+    colors: ["#e8772e", "#f2a65a", "#c0392b"],
+    shape: "polygon",
+    count: 45,
+    size: 9,
+    speed: 2,
+    direction: "bottom-left",
+    opacity: 0.9,
+    twinkle: false,
+  },
+};
+
 const root = document.documentElement; // the <html> element
 const radios = document.querySelectorAll('input[name="season"]');
 const soundToggle = document.querySelector("#sound-toggle");
@@ -40,6 +85,55 @@ function playSeasonSound(season) {
   });
 }
 
+/* NEW CHANGE 24: builds the full particles.js config from a season's short description. */
+function buildParticlesConfig(p) {
+  // Fewer particles on small screens: better performance and less clutter
+  const count = window.innerWidth < 768 ? Math.round(p.count / 2) : p.count;
+  return {
+    particles: {
+      number: { value: count, density: { enable: true, value_area: 800 } },
+      color: { value: p.colors },
+      shape: { type: p.shape, polygon: { nb_sides: 5 } },
+      opacity: {
+        value: p.opacity,
+        random: true,
+        anim: { enable: p.twinkle, speed: 1, opacity_min: 0.1, sync: false },
+      },
+      size: { value: p.size, random: true },
+      line_linked: { enable: false },
+      move: {
+        enable: true,
+        speed: p.speed,
+        direction: p.direction,
+        random: true,
+        straight: false,
+        out_mode: "out",
+      },
+    },
+    interactivity: {
+      events: {
+        onhover: { enable: false },
+        onclick: { enable: false },
+        resize: true,
+      },
+    },
+    retina_detect: true,
+  };
+}
+
+/* NEW CHANGE 25: destroy the previous animation, then start the new one.
+   Without destroying, each click would stack another canvas on top. */
+function renderParticles(season) {
+  if (typeof particlesJS === "undefined") return; // CDN blocked/offline: page still works
+  if (window.pJSDom && window.pJSDom.length) {
+    window.pJSDom[0].pJS.fn.vendors.destroypJS();
+    window.pJSDom = [];
+  }
+  // Respect "reduce motion": show a calm page with no animation
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  particlesJS("particles", buildParticlesConfig(PARTICLES[season]));
+}
+
 /* CHANGE 16: one small function does the real work: it only changes an attribute;
    CSS handles every visual consequence. */
 function setSeason(season, { sound = true } = {}) {
@@ -48,6 +142,7 @@ function setSeason(season, { sound = true } = {}) {
   try {
     localStorage.setItem(STORAGE_KEY, season);
   } catch {} // remember choice
+  renderParticles(season); // NEW CHANGE 26
   if (sound) playSeasonSound(season);
 }
 
@@ -64,4 +159,6 @@ try {
 if (saved && SEASONS[saved]) {
   setSeason(saved, { sound: false });
   document.querySelector(`input[value="${saved}"]`).checked = true;
+} else {
+  renderParticles(root.dataset.season); // NEW CHANGE 27: first visit: start winter particles
 }

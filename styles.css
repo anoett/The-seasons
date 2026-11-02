@@ -1,25 +1,36 @@
-/* CHANGE 7: one block of design tokens (CSS variables) per season.
-   To add a season or tweak a colour you edit ONE place. */
+/* CHANGE 7 (UPDATED): one block of design tokens per season.
+   NEW CHANGE 21: backgrounds are now darker/more saturated so the white
+   snow, pink petals, etc. are actually visible against them. */
 :root,
 [data-season="winter"] {
-  --bg: #dbe7f1;
-  --text: #16293a;
-  --accent: #3c6e99;
+  --bg: #14263b;
+  --text: #eaf2fa;
+  --accent: #8fc4ee;
 }
 [data-season="spring"] {
-  --bg: #e3f1d6;
+  --bg: #bfe3b4;
   --text: #1f3a1c;
-  --accent: #d96c9a;
+  --accent: #a8325f;
 }
 [data-season="summer"] {
-  --bg: #ffe9a8;
+  --bg: #ffcf5c;
   --text: #4a2b00;
-  --accent: #e2671b;
+  --accent: #a83e08;
 }
 [data-season="autumn"] {
-  --bg: #f0c9a0;
-  --text: #3d1f0d;
-  --accent: #a8431a;
+  --bg: #5a2d14;
+  --text: #fbe9d7;
+  --accent: #f2a65a;
+}
+
+/* NEW CHANGE 22: the particles layer is fixed to the viewport, sits BEHIND
+   the content (z-index: -1) and ignores clicks (pointer-events: none),
+   so buttons and links stay usable. */
+#particles {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
 }
 
 /* CHANGE 8: the page only uses the variables, never raw colours.
