@@ -1,0 +1,104 @@
+/* CHANGE 7: one block of design tokens (CSS variables) per season.
+   To add a season or tweak a colour you edit ONE place. */
+:root,
+[data-season="winter"] {
+  --bg: #dbe7f1;
+  --text: #16293a;
+  --accent: #3c6e99;
+}
+[data-season="spring"] {
+  --bg: #e3f1d6;
+  --text: #1f3a1c;
+  --accent: #d96c9a;
+}
+[data-season="summer"] {
+  --bg: #ffe9a8;
+  --text: #4a2b00;
+  --accent: #e2671b;
+}
+[data-season="autumn"] {
+  --bg: #f0c9a0;
+  --text: #3d1f0d;
+  --accent: #a8431a;
+}
+
+/* CHANGE 8: the page only uses the variables, never raw colours.
+   The transition animates the colour change smoothly. */
+body {
+  margin: 0;
+  padding: clamp(1rem, 4vw, 3rem); /* fluid spacing: grows with screen width */
+  font-family: system-ui, sans-serif;
+  line-height: 1.6;
+  background-color: var(--bg);
+  color: var(--text);
+  transition:
+    background-color 0.8s ease,
+    color 0.8s ease;
+}
+a {
+  color: var(--accent);
+}
+
+/* CHANGE 9: responsive image: never wider than its container */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* CHANGE 10: picker layout. flex-wrap lets buttons drop to a new line
+   on narrow screens, so no media query is needed. */
+.season-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  border: 0;
+  padding: 0;
+  margin: 1rem 0;
+}
+.season-picker legend {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+/* Hide the raw radio circle visually but keep it usable by keyboard/screen readers */
+.season-picker input {
+  position: absolute;
+  opacity: 0;
+}
+.season-picker span {
+  display: inline-block;
+  padding: 0.6rem 1.1rem; /* ~44px tall: comfortable touch target */
+  border: 2px solid var(--accent);
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
+}
+.season-picker input:checked + span {
+  background: var(--accent);
+  color: var(--bg);
+}
+/* Visible keyboard focus (accessibility) */
+.season-picker input:focus-visible + span {
+  outline: 3px solid var(--text);
+  outline-offset: 2px;
+}
+
+/* CHANGE 11: respect users who ask their OS to reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  body,
+  .season-picker span {
+    transition: none;
+  }
+}
+
+/* CHANGE 12: larger screens: constrain line length for readability */
+@media (min-width: 768px) {
+  header,
+  footer,
+  body > p {
+    max-width: 60rem;
+    margin-inline: auto;
+  }
+}
